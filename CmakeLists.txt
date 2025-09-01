@@ -2,4 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project(learnOpenGL)
 
-add_executable(learnOpenGL main.cpp)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third/include")
+link_libraries("${CMAKE_CURRENT_SOURCE_DIR}/third/lib")
+
+add_executable(learnOpenGL main.cpp "third/glad.c" "drawer/drawer.h" "drawer/drawer.cpp")
+
+target_link_libraries(learnOpenGL ${CMAKE_CURRENT_SOURCE_DIR}/third/lib/glfw3.lib)
