@@ -5,6 +5,9 @@ project(CDGeometry)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third/include")
 link_libraries("${CMAKE_CURRENT_SOURCE_DIR}/third/lib")
 
-add_executable(CDGeometry main.cpp "third/glad.c" "drawer/drawer.h" "drawer/drawer.cpp" "drawer/primitive.h" "drawer/primitive.cpp" "drawer/program.h" "drawer/shaders/shader.h" "drawer/shaders/shader.cpp" "geometryProcess/cubicSpline.h")
+file(GLOB_RECURSE SRC_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+list(FILTER SRC_FILES EXCLUDE REGEX ".*CMakeFiles.*")
+
+add_executable(CDGeometry ${SRC_FILES})
 
 target_link_libraries(CDGeometry ${CMAKE_CURRENT_SOURCE_DIR}/third/lib/glfw3.lib)
