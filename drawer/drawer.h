@@ -1,8 +1,9 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include "primitive.h"
 class Drawer
 {
 public:
@@ -10,6 +11,7 @@ public:
 	~Drawer() {};
 
 	GLFWwindow* window;
+	std::vector<Primitive*> primitives;
 
 	int initWindows();
 	int draw();

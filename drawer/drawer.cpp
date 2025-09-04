@@ -31,6 +31,15 @@ int Drawer::draw(){
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		// 绘制几何体
+		for (Primitive* pri : primitives) {
+			pri->shaderProgram->use();
+			glBindVertexArray(pri->VAO);
+			pri->update();
+			glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
+		}
+		glBindVertexArray(0);
+
 		//// 检查并调用事件，交换缓冲
 		glfwPollEvents();
 		glfwSwapBuffers(window);

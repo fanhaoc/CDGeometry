@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(learnOpenGL)
+project(CDGeometry)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third/include")
 link_libraries("${CMAKE_CURRENT_SOURCE_DIR}/third/lib")
 
-add_executable(learnOpenGL main.cpp "third/glad.c" "drawer/drawer.h" "drawer/drawer.cpp")
+add_executable(CDGeometry main.cpp "third/glad.c" "drawer/drawer.h" "drawer/drawer.cpp" "drawer/primitive.h" "drawer/primitive.cpp" "drawer/program.h" "drawer/shaders/shader.h" "drawer/shaders/shader.cpp" "geometryProcess/cubicSpline.h")
 
-target_link_libraries(learnOpenGL ${CMAKE_CURRENT_SOURCE_DIR}/third/lib/glfw3.lib)
+target_link_libraries(CDGeometry ${CMAKE_CURRENT_SOURCE_DIR}/third/lib/glfw3.lib)
