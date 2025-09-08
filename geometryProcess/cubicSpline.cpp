@@ -47,6 +47,7 @@ void CubicSpline::solver() {
 	Eigen::VectorXd x = lu.solve(resMatrix);
 	// 转换为参数形式并写入
 	for (int i = 0; i != n; ++i) {
+
 		double h_i = spline.x[i + 1] - spline.x[i];
 		if (i == 0) {
 			double a = x[i] / (6 * h_i);
@@ -54,7 +55,7 @@ void CubicSpline::solver() {
 			spline.a.emplace_back(a);
 			spline.b.emplace_back(0);
 			spline.c.emplace_back(c);
-			spline.c.emplace_back(spline.y[i]);
+			spline.d.emplace_back(spline.y[i]);
 			continue;
 		}
 		if (i == spline.x.size() - 2) {
@@ -63,7 +64,7 @@ void CubicSpline::solver() {
 			spline.a.emplace_back(a);
 			spline.b.emplace_back(0);
 			spline.c.emplace_back(c);
-			spline.c.emplace_back(spline.y[i]);
+			spline.d.emplace_back(spline.y[i]);
 			continue;
 		}
 		double a = (x[i] - x[i - 1]) / (6.0 * h_i);
@@ -71,6 +72,6 @@ void CubicSpline::solver() {
 		spline.a.emplace_back(a);
 		spline.b.emplace_back(0);
 		spline.c.emplace_back(c);
-		spline.c.emplace_back(spline.y[i]);
+		spline.d.emplace_back(spline.y[i]);
 	}
 }
