@@ -15,10 +15,10 @@ int main() {
 		
 
 		CubicSpline *cspline = new CubicSpline();
-		cspline->addPoint(27.7, 4.1);
-		cspline->addPoint(28, 4.3);
-		cspline->addPoint(29, 4.1);
-		cspline->addPoint(30, 3.0);
+		cspline->addPoint(-1.87, -19.21339);
+		cspline->addPoint(1.68, 21.03558);
+		cspline->addPoint(12.04, 28.70792);
+		cspline->addPoint(31.3, -32.11539);
 		cspline->solver();
 		std::cout << "spline param: a:" << cspline->spline.a[0] 
 			<<"b:" << cspline->spline.b[0]
