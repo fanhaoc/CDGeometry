@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project(CDGeometry)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third/include")
 link_libraries("${CMAKE_CURRENT_SOURCE_DIR}/third/lib")
 

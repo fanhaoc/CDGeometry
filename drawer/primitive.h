@@ -1,8 +1,10 @@
 #pragma once
+#include <filesystem>
+#include <vector>
+//#include <strstream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "program.h"
 #include "shaders/shader.h"
 
 class Primitive
@@ -20,16 +22,19 @@ public:
 
     unsigned int indices[6] = {
         0, 1, 3, // 第一个三角形
-        1, 2, 3  // 第二个三角形
+        //1, 2, 3  // 第二个三角形
     };
 
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int EBO;
-	Shader* shaderProgram = new Shader("G:/0_cfh/projects/learnOpenGL/drawer/shaders/defaultShader.vs", "G:/0_cfh/projects/learnOpenGL/drawer/shaders/defaultShader.fs");
+    std::string shaderName = "defaultShader";
+    
+    Shader* shaderProgram;
     int indicesSize = 0;
 
 	int setupBuffer();
+    int setupShader();
     void update();
 
 private:

@@ -1,6 +1,7 @@
 #include "primitive.h"
 
 Primitive::Primitive() {
+	setupShader();
 	setupBuffer();
 };
 
@@ -20,6 +21,33 @@ int Primitive::setupBuffer() {
 
 	indicesSize = sizeof(indices) / sizeof(unsigned int);
 	return 0;
+}
+
+int Primitive::setupShader() {
+	//char currentPath[_MAX_PATH];
+	std::string currentPath = std::filesystem::current_path().string();
+	std::stringstream ss(currentPath);
+	std::vector<std::string> tokens;
+	std::string projectPath;
+	std::string token;
+	std::string projectName = "CDGeometry";
+	while (std::getline(ss, token, '\\')) {
+		projectPath += token;
+		projectPath.push_back('/');
+		// 判断是否位于当前项目目录
+		if (token == projectName) {
+			break;
+		}
+	}
+	std::cout << projectPath << std::endl;
+	std::string shaderPath = "drawer/shaders/";
+
+	std::string fullPath = projectPath + shaderPath + shaderName;
+	std::cout << fullPath << std::endl;
+	std::string vs = fullPath + ".vs";
+	std::string fs = fullPath + ".fs";
+	shaderProgram = new Shader(vs.c_str(), fs.c_str());
+	return 1;
 }
 
 void Primitive::update() {
