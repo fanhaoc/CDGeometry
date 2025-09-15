@@ -3,6 +3,7 @@
 Primitive::Primitive() {
 	setupShader();
 	setupBuffer();
+	setupTexture();
 };
 
 int Primitive::setupBuffer() {
@@ -24,30 +25,24 @@ int Primitive::setupBuffer() {
 }
 
 int Primitive::setupShader() {
-	//char currentPath[_MAX_PATH];
-	std::string currentPath = std::filesystem::current_path().string();
-	std::stringstream ss(currentPath);
-	std::vector<std::string> tokens;
-	std::string projectPath;
-	std::string token;
-	std::string projectName = "CDGeometry";
-	while (std::getline(ss, token, '\\')) {
-		projectPath += token;
-		projectPath.push_back('/');
-		// 判断是否位于当前项目目录
-		if (token == projectName) {
-			break;
-		}
-	}
-	std::cout << projectPath << std::endl;
-	std::string shaderPath = "drawer/shaders/";
-
-	std::string fullPath = projectPath + shaderPath + shaderName;
-	std::cout << fullPath << std::endl;
-	std::string vs = fullPath + ".vs";
-	std::string fs = fullPath + ".fs";
-	shaderProgram = new Shader(vs.c_str(), fs.c_str());
+	std::string vsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".vs");
+	std::string fsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".fs");
+	shaderProgram = new Shader(vsPath.c_str(), fsPath.c_str());
 	return 1;
+}
+
+int Primitive::setupTexture() {
+	int width, height, nrChannel;
+	std::string image = "assets/container.jpg";
+	std::string imagePath = Trick::solvePath(image);
+	unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannel, 0);
+
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 void Primitive::update() {
