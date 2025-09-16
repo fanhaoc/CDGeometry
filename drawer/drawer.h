@@ -11,7 +11,12 @@ public:
 	~Drawer() {};
 
 	GLFWwindow* window;
+	float screenWidth = 800;
+	float screenHeight = 600;
+	//glm::mat4 viewMatrix;
+	//glm::mat4 projMatrix;
 	std::vector<Primitive*> primitives;
+
 
 	int initWindows();
 	int draw();
