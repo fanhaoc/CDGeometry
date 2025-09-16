@@ -34,7 +34,9 @@ int Drawer::draw(){
 		// 绘制几何体
 		for (Primitive* pri : primitives) {
 			pri->shaderProgram->use();
+			glBindTexture(GL_TEXTURE_2D, pri->texture);
 			glBindVertexArray(pri->VAO);
+			
 			pri->update();
 			glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
 		}

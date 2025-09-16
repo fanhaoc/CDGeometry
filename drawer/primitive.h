@@ -4,8 +4,10 @@
 //#include <strstream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 #include "shaders/shader.h"
 #include "trick.h"
@@ -16,16 +18,23 @@ public:
 	Primitive();
 	~Primitive() {}
 	;
-    float vertices[12] = {
-        0.5f, 0.5f, 0.0f,   // 右上角
-        0.5f, -0.5f, 0.0f,  // 右下角
-        -0.5f, -0.5f, 0.0f, // 左下角
-        -0.5f, 0.5f, 0.0f   // 左上角
+    //float vertices[12] = {
+    //    0.5f, 0.5f, 0.0f,   // 右上角
+    //    0.5f, -0.5f, 0.0f,  // 右下角
+    //    -0.5f, -0.5f, 0.0f, // 左下角
+    //    -0.5f, 0.5f, 0.0f   // 左上角
+    //};
+    float vertices[32] = {
+        //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+             0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+             0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
+            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
     };
 
     unsigned int indices[6] = {
         0, 1, 3, // 第一个三角形
-        //1, 2, 3  // 第二个三角形
+        1, 2, 3  // 第二个三角形
     };
 
     float texCoords[6] = {
@@ -37,6 +46,7 @@ public:
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int EBO;
+    unsigned int texture;
     std::string shaderName = "defaultShader";
     
     Shader* shaderProgram;
