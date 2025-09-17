@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "primitive.h"
+#include "camera.h"
 class Drawer
 {
 public:
@@ -16,6 +17,7 @@ public:
 	//glm::mat4 viewMatrix;
 	//glm::mat4 projMatrix;
 	std::vector<Primitive*> primitives;
+	Camera* camera = new Camera();
 
 
 	int initWindows();

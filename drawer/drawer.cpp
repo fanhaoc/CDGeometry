@@ -48,7 +48,7 @@ int Drawer::draw(){
 			// ´«ÈëviewºÍprojection¾ØÕó
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
 			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
 			
 			pri->update();
