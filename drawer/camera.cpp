@@ -18,13 +18,14 @@ Camera::~Camera()
 void Camera::updateCameraParams() {
 	//cameraDirection = glm::normalize(cameraPos - cameraTarget);
 	// fps camera
-	cameraDirection = glm::vec3(0.0, 0.0, -1.0);
-	cameraRight = glm::normalize(glm::cross(worldUp, cameraDirection));
-	cameraUp = glm::cross(cameraDirection, cameraRight);
+	//cameraDirection = glm::vec3(0.0, 0.0, -1.0);
+	cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));
+	cameraUp = glm::cross(cameraRight, cameraFront);
 	cameraTarget = cameraPos + cameraFront;
 	viewMatrix = glm::lookAt(cameraPos, cameraTarget, cameraUp);
 }
 
 void Camera::moveCameraPos(glm::vec3 direction, float distance) {
-
+	cameraPos += direction * distance;
+	updateCameraParams();
 }

@@ -13,13 +13,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 int main() {
 		std::cout << "Hello, World!" << std::endl;
 
-		Drawer drawer;
-		drawer.initWindows();
-		glfwSetFramebufferSizeCallback(drawer.window, framebuffer_size_callback);
+		Drawer *drawer =new Drawer();
+		drawer->initWindows();
+		glfwSetFramebufferSizeCallback(drawer->window, framebuffer_size_callback);
 		// 添加几何体
-		drawer.primitives.push_back(new Primitive());
+		drawer->primitives.push_back(new Primitive());
 
-		drawer.draw();
+		drawer->draw();
 
 		system("pause");
 		return 0;

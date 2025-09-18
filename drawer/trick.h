@@ -26,4 +26,8 @@ public:
 		std::string fullPath = projectPath + path;
 		return fullPath;
 	};
+
+	static bool almostEqual(const glm::vec3& a, const glm::vec3& b, float epsilon = 1e-6f) {
+		return glm::all(glm::lessThan(glm::abs(a - b), glm::vec3(epsilon)));
+	}
 };
