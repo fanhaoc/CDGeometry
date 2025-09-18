@@ -17,7 +17,5 @@ public:
 	~Camera();
 	void updateCameraParams();
 	void moveCameraPos(glm::vec3 direction, float distance);
-
-private:
-
+	glm::vec3 getForwardDir(float yaw);
 };

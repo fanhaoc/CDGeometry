@@ -85,9 +85,9 @@ void Drawer::processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera->moveCameraPos(-camera->cameraDirection, cameraSpeed);
+		camera->moveCameraPos(camera->getForwardDir(yaw), cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera->moveCameraPos(camera->cameraDirection, cameraSpeed);
+		camera->moveCameraPos(-camera->getForwardDir(yaw), cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		camera->moveCameraPos(-camera->cameraRight, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
