@@ -56,11 +56,15 @@ int Drawer::draw(){
 			glBindTexture(GL_TEXTURE_2D, pri->texture);
 			glBindVertexArray(pri->VAO);
 
-			// 传入view和projection矩阵
+			// 传入view和projection矩阵，光照
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
 			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
 			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
+			unsigned int lightColorLoc = glGetUniformLocation(pri->shaderProgram->ID, "lightColor");
+			glUniform3fv(lightColorLoc, 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
+			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
+			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
 			
 			pri->update();
 			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
@@ -77,7 +81,7 @@ int Drawer::draw(){
 }
 void Drawer::processInput(GLFWwindow* window)
 {
-	float cameraSpeed = 2.5f * deltaFrame;
+	float cameraSpeed = deltaFrame;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)

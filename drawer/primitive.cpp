@@ -3,10 +3,16 @@
 #include <stb_image.h>
 
 Primitive::Primitive() {
+
+};
+
+int Primitive::setup() {
 	setupShader();
 	setupBuffer();
-	setupTexture();
-};
+	setupUniform();
+	//setupTexture();
+	return 1;
+}
 
 int Primitive::setupBuffer() {
 
@@ -16,12 +22,12 @@ int Primitive::setupBuffer() {
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
 	//glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -62,15 +68,24 @@ int Primitive::setupTexture() {
 	return 1;
 }
 
+int Primitive::setupUniform() {
+	shaderProgram->use();
+	// 基础颜色和模型矩阵
+	unsigned int modelLoc = glGetUniformLocation(shaderProgram->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+	unsigned int colorLoc = glGetUniformLocation(shaderProgram->ID, "objectColor");
+	glUniform3fv(colorLoc, 1,glm::value_ptr(baseColor));
+	return 1;
+}
+
 void Primitive::update() {
 	//float timeValue = glfwGetTime();
 	//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 	//shaderProgram->use();
 	//int vertexColorLocation = glGetUniformLocation(shaderProgram->ID, "ourColor");
 	//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-	glm::mat4 modelMatrix;
-	modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+	//glm::mat4 modelMatrix;
+	//modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-	unsigned int modelLoc = glGetUniformLocation(shaderProgram->ID, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
 }

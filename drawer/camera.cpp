@@ -26,6 +26,7 @@ void Camera::updateCameraParams() {
 }
 
 void Camera::moveCameraPos(glm::vec3 direction, float distance) {
-	cameraPos += direction * distance;
+	float cameraSpeed = 2.5f * distance;
+	cameraPos += direction * cameraSpeed;
 	updateCameraParams();
 }
