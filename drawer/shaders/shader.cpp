@@ -23,6 +23,7 @@ Shader::Shader(const char* veretxPath, const char* fragmentPath) {
 		// 转换数据流到string
 		vertexCode = vShaderStream.str();
 		fragmentCode = fShaderStream.str();
+		std::cout << fragmentCode << std::endl;
 	}
 	catch(std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;

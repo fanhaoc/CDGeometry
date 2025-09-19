@@ -51,22 +51,24 @@ int Drawer::draw(){
 		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
 		// 绘制几何体
-		for (Primitive* pri : primitives) {
+		for (Primitive* pri : scene->primitives) {
 			pri->shaderProgram->use();
 			glBindTexture(GL_TEXTURE_2D, pri->texture);
 			glBindVertexArray(pri->VAO);
+			scene->light->setup(pri->shaderProgram->ID);
 
 			// 传入view和projection矩阵，光照
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
 			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
 			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
-			unsigned int lightColorLoc = glGetUniformLocation(pri->shaderProgram->ID, "lightColor");
-			glUniform3fv(lightColorLoc, 1, glm::value_ptr(glm::vec3(1.0, 1.0, 1.0)));
 			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
 			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
+
+			
 			
 			pri->update();
+
 			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}

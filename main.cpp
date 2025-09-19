@@ -6,6 +6,8 @@
 #include "drawer/drawer.h"
 #include "drawer/primitive.h"
 #include "geometryProcess/cubicSpline.h"
+#include "drawer/scene.h"
+#include "drawer/light.h"
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -13,7 +15,14 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 int main() {
 		std::cout << "Hello, World!" << std::endl;
 
-		Drawer *drawer =new Drawer();
+		Scene* scene = new Scene();
+
+		Light* light = new Light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(1.0, 1.0, 1.0));
+
+		scene->light = light;
+		
+
+		Drawer *drawer =new Drawer(scene);
 		drawer->initWindows();
 		glfwSetFramebufferSizeCallback(drawer->window, framebuffer_size_callback);
 		// 添加灯光物体
@@ -21,14 +30,14 @@ int main() {
 		lightCube->shaderName = "basicColorShader";
 		lightCube->modelMatrix = glm::translate(lightCube->modelMatrix, glm::vec3(1.2f, 1.0f, 2.0f));
 		lightCube->modelMatrix = glm::scale(lightCube->modelMatrix, glm::vec3(0.2f));
-		drawer->primitives.push_back(lightCube);
+		scene->primitives.push_back(lightCube);
 		lightCube->setup();
 		// 添加几何体
 		Primitive* cubeObj = new Primitive();
 		cubeObj->shaderName = "phongColorShader";
 		cubeObj->baseColor = glm::vec4(1.0, 1.0, 0.0, 1.0);
 		cubeObj->setup();
-		drawer->primitives.push_back(cubeObj);
+		scene->primitives.push_back(cubeObj);
 
 		drawer->draw();
 

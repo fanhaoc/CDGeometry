@@ -7,11 +7,13 @@
 #include "primitive.h"
 #include "camera.h"
 #include "trick.h"
+#include "scene.h"
 
 class Drawer
 {
 public:
-	Drawer() {
+	Drawer(Scene *_scene) {
+		scene = _scene;
 		cameraFront = camera->cameraFront;
 	};
 	~Drawer() {};
@@ -32,6 +34,8 @@ public:
 	//glm::mat4 projMatrix;
 	std::vector<Primitive*> primitives;
 	Camera* camera = new Camera();
+
+	Scene* scene;
 
 
 	int initWindows();
