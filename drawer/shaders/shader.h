@@ -9,7 +9,7 @@ class Shader
 public:
 	// 程序ID
 	unsigned int ID;
-	Shader(const char* vertexPath, const char* fragmentPath);
+	Shader(const char* vertexPath, const char* fragmentPath, const char* preFragmentPath);
 	~Shader();
 	// 使用程序
 	void use();

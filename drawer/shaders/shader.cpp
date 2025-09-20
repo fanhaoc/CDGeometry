@@ -1,29 +1,33 @@
 #include "shader.h"
 
-Shader::Shader(const char* veretxPath, const char* fragmentPath) {
+Shader::Shader(const char* veretxPath, const char* fragmentPath, const char* preFragmentPath) {
 	// 读取文件获取source
 	std::string vertexCode;
 	std::string fragmentCode;
 	std::ifstream vShaderFile;
 	std::ifstream fShaderFile;
+	std::ifstream pfShaderFile;
 	// 保证ifstream对象可以抛出异常
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	pfShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try {
 		// 打开文件
 		vShaderFile.open(veretxPath);
 		fShaderFile.open(fragmentPath);
-		std::stringstream vShaderStream, fShaderStream;
+		pfShaderFile.open(preFragmentPath);
+		std::stringstream vShaderStream, fShaderStream, pfShaderStream;
 		// 读取文件的缓冲内容到数据流中
 		vShaderStream << vShaderFile.rdbuf();
 		fShaderStream << fShaderFile.rdbuf();
+		pfShaderStream << pfShaderFile.rdbuf();
 		//  关闭文件
 		vShaderFile.close();
 		fShaderFile.close();
+		pfShaderFile.close();
 		// 转换数据流到string
 		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
-		std::cout << fragmentCode << std::endl;
+		fragmentCode = pfShaderStream.str() + fShaderStream.str();
 	}
 	catch(std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;

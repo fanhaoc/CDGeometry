@@ -40,7 +40,9 @@ int Primitive::setupBuffer() {
 int Primitive::setupShader() {
 	std::string vsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".vs");
 	std::string fsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".fs");
-	shaderProgram = new Shader(vsPath.c_str(), fsPath.c_str());
+	std::string pre = "drawer/shaders/presetShader.fs";
+	std::string preFsPath = Trick::solvePath(pre);
+	shaderProgram = new Shader(vsPath.c_str(), fsPath.c_str(), preFsPath.c_str());
 	return 1;
 }
 
@@ -73,8 +75,14 @@ int Primitive::setupUniform() {
 	// 基础颜色和模型矩阵
 	unsigned int modelLoc = glGetUniformLocation(shaderProgram->ID, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-	unsigned int colorLoc = glGetUniformLocation(shaderProgram->ID, "objectColor");
-	glUniform3fv(colorLoc, 1,glm::value_ptr(baseColor));
+	unsigned int ambientLoc = glGetUniformLocation(shaderProgram->ID, "material.ambient");
+	glUniform3fv(ambientLoc, 1,glm::value_ptr(ambient));
+	unsigned int diffuseLoc = glGetUniformLocation(shaderProgram->ID, "material.diffuse");
+	glUniform3fv(diffuseLoc, 1, glm::value_ptr(diffuse));
+	unsigned int specularLoc = glGetUniformLocation(shaderProgram->ID, "material.specular");
+	glUniform3fv(specularLoc, 1, glm::value_ptr(specular));
+	unsigned int shininessLoc = glGetUniformLocation(shaderProgram->ID, "material.shininess");
+	glUniform1f(shininessLoc,shininess);
 	return 1;
 }
 

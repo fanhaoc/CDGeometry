@@ -83,8 +83,13 @@ public:
 	unsigned int VBO;
 	unsigned int EBO;
     unsigned int texture;
+    // uniform±‰¡ø
     glm::mat4 modelMatrix;
-    glm::vec4 baseColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
+    //glm::vec4 baseColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
+    glm::vec3 ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+    glm::vec3 diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+    glm::vec3 specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    float shininess = 32.0f;
     std::string shaderName = "basicTextureShader";
     
     Shader* shaderProgram;

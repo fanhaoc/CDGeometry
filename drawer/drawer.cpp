@@ -55,9 +55,11 @@ int Drawer::draw(){
 			pri->shaderProgram->use();
 			glBindTexture(GL_TEXTURE_2D, pri->texture);
 			glBindVertexArray(pri->VAO);
-			scene->light->setup(pri->shaderProgram->ID);
+
+			
 
 			// 传入view和projection矩阵，光照
+			scene->light->setup(pri->shaderProgram->ID);
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
 			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
 			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
