@@ -78,7 +78,7 @@ public:
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int EBO;
-    unsigned int texture;
+    std::vector<unsigned int> textures;
     // uniform±‰¡ø
     glm::mat4 modelMatrix;
     //glm::vec4 baseColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
@@ -87,6 +87,8 @@ public:
     glm::vec3 specular = glm::vec3(0.5f, 0.5f, 0.5f);
     float shininess = 32.0f;
     std::string shaderName = "basicTextureShader";
+    
+    std::vector<std::string> textureUrls;
     
     Shader* shaderProgram;
     int indicesSize = 0;

@@ -50,11 +50,18 @@ int Drawer::draw(){
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -3.0));
 		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
+
+		
 		// 绘制几何体
 		for (Primitive* pri : scene->primitives) {
 			pri->shaderProgram->use();
 
-			glBindTexture(GL_TEXTURE_2D, pri->texture);
+			unsigned int texture_index = -1;
+			for (unsigned int texture : pri->textures) {
+				
+				glActiveTexture(GL_TEXTURE0 + ++texture_index);
+				glBindTexture(GL_TEXTURE_2D, texture);
+			}
 			glBindVertexArray(pri->VAO);
 
 			

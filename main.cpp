@@ -32,6 +32,10 @@ int main() {
 		// 添加几何体
 		Primitive* cubeObj = new Primitive();
 		cubeObj->shaderName = "basicTextureShader";
+		cubeObj->textureUrls.emplace_back("container2.png");
+		cubeObj->textureUrls.emplace_back("container2_specular.png");
+		cubeObj->textureUrls.emplace_back("matrix.jpg");
+
 		cubeObj->setup();
 		scene->primitives.push_back(cubeObj);
 

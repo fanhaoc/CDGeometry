@@ -14,6 +14,10 @@ void Light::setup(unsigned int ID) {
 	glUniform3fv(diffuseLoc, 1, glm::value_ptr(diffuse));
 	unsigned int specularLoc = glGetUniformLocation(ID, "light.specular");
 	glUniform3fv(specularLoc, 1, glm::value_ptr(specular));
+	// Ë¥¼õÏµÊý
+	glUniform1f(glGetUniformLocation(ID, "light.constant"), constant);
+	glUniform1f(glGetUniformLocation(ID, "light.linear"), linear);
+	glUniform1f(glGetUniformLocation(ID, "light.quadratic"), quadratic);
 }
 
 Primitive* Light::debugLightCube() {

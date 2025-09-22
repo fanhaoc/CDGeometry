@@ -48,24 +48,31 @@ int Primitive::setupShader() {
 
 int Primitive::setupTexture() {
 	int width, height, nrChannel;
-	std::string image = "assets/container2.png";
-	std::string imagePath = Trick::solvePath(image);
-	unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannel, 0);
+	for (std::string textureUrl : textureUrls) {
+		std::string image = "assets/" + textureUrl;
+		auto rgbFormat = GL_RGB;
+		if (textureUrl.find(".png") != std::string::npos) { rgbFormat = GL_RGBA; }
+		std::string imagePath = Trick::solvePath(image);
+		unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannel, 0);
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		unsigned int texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (data) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, rgbFormat, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else {
+			std::cout << "fail to load texture" << std::endl;
+		}
+		textures.push_back(texture);
+		stbi_image_free(data);
 	}
-	else {
-		std::cout << "fail to load texture" << std::endl;
-	}
-	stbi_image_free(data);
+
 	return 1;
 }
 
@@ -82,6 +89,10 @@ int Primitive::setupUniform() {
 	glUniform3fv(specularLoc, 1, glm::value_ptr(specular));
 	unsigned int shininessLoc = glGetUniformLocation(shaderProgram->ID, "material.shininess");
 	glUniform1f(shininessLoc,shininess);
+	// ÉèÖÃÌùÍ¼
+	glUniform1i(glGetUniformLocation(shaderProgram->ID, "u_texture0"), 0);
+	glUniform1i(glGetUniformLocation(shaderProgram->ID, "u_texture1"), 1);
+	glUniform1i(glGetUniformLocation(shaderProgram->ID, "u_texture2"), 2);
 	
 	return 1;
 }

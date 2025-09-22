@@ -5,7 +5,9 @@ in vec3 v_pos;
 in vec3 v_normal;
 
 uniform vec3 viewPos;
-uniform sampler2D ourTexture;
+uniform sampler2D u_texture0;
+uniform sampler2D u_texture1;
+uniform sampler2D u_texture2;
 
 vec3 c_phong(vec3 fragPos, vec3 normal, Material material){
 	// »·¾³¹â
@@ -20,14 +22,21 @@ vec3 c_phong(vec3 fragPos, vec3 normal, Material material){
 	float spec = pow(max(dot(normal, halfDir), 0.0), material.shininess);
 	vec3 specular = spec * material.specular * light.specular;
 
-	return ambient + diffuse + specular;
+	float distanceFL = length(light.position - fragPos);
+	float attenuation = 1.0 / (light.constant + light.linear * distanceFL + light.quadratic * distanceFL * distanceFL);
+
+	return (ambient + diffuse + specular) * attenuation;
 }
 
 void main()
 {
 	Material defaultMaterail = material;
-	defaultMaterail.diffuse =  texture(ourTexture, v_texcoord).rgb;
+	defaultMaterail.diffuse =  texture(u_texture0, v_texcoord).rgb;
+	defaultMaterail.ambient =  defaultMaterail.diffuse;
+	defaultMaterail.specular = texture(u_texture1, v_texcoord).rgb;
 	vec3 resColor = c_phong(v_pos, v_normal, defaultMaterail);
 
-    FragColor = vec4(resColor, 1.0);
+	vec3 emission = texture(u_texture2, v_texcoord).rgb;
+
+    FragColor = vec4(resColor + emission, 1.0);
 }

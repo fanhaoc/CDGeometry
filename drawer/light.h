@@ -18,6 +18,10 @@ public:
 	glm::vec3 diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
+	float constant = 1.0;
+	float linear = 0.045;
+	float quadratic = 0.0075;
+
 	void setup(unsigned int ID);
 	Primitive* debugLightCube();
 private:
