@@ -10,7 +10,7 @@ int Primitive::setup() {
 	setupShader();
 	setupBuffer();
 	setupUniform();
-	//setupTexture();
+	setupTexture();
 	return 1;
 }
 
@@ -22,12 +22,12 @@ int Primitive::setupBuffer() {
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -48,9 +48,8 @@ int Primitive::setupShader() {
 
 int Primitive::setupTexture() {
 	int width, height, nrChannel;
-	std::string image = "assets/container.jpg";
+	std::string image = "assets/container2.png";
 	std::string imagePath = Trick::solvePath(image);
-	std::cout << imagePath << std::endl;
 	unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannel, 0);
 
 	glGenTextures(1, &texture);
@@ -60,7 +59,7 @@ int Primitive::setupTexture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
@@ -83,6 +82,7 @@ int Primitive::setupUniform() {
 	glUniform3fv(specularLoc, 1, glm::value_ptr(specular));
 	unsigned int shininessLoc = glGetUniformLocation(shaderProgram->ID, "material.shininess");
 	glUniform1f(shininessLoc,shininess);
+	
 	return 1;
 }
 

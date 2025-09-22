@@ -53,6 +53,7 @@ int Drawer::draw(){
 		// 绘制几何体
 		for (Primitive* pri : scene->primitives) {
 			pri->shaderProgram->use();
+
 			glBindTexture(GL_TEXTURE_2D, pri->texture);
 			glBindVertexArray(pri->VAO);
 

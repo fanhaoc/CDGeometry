@@ -31,7 +31,7 @@ int main() {
 		lightCube->setup();
 		// 添加几何体
 		Primitive* cubeObj = new Primitive();
-		cubeObj->shaderName = "phongColorShader";
+		cubeObj->shaderName = "basicTextureShader";
 		cubeObj->setup();
 		scene->primitives.push_back(cubeObj);
 
