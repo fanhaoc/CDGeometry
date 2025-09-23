@@ -8,9 +8,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third/include")
 link_libraries("${CMAKE_CURRENT_SOURCE_DIR}/third/lib")
 
-file(GLOB_RECURSE SRC_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+
+file(GLOB_RECURSE SRC_FILES  
+"${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" 
+"${CMAKE_CURRENT_SOURCE_DIR}/*.h" 
+"${CMAKE_CURRENT_SOURCE_DIR}/*.c"
+)
 list(FILTER SRC_FILES EXCLUDE REGEX ".*CMakeFiles.*")
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/third/lib/assimp-vc143-mtd.dll" 
+DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/out/build/x64-Debug")
+
 
 add_executable(CDGeometry ${SRC_FILES})
 
-target_link_libraries(CDGeometry ${CMAKE_CURRENT_SOURCE_DIR}/third/lib/glfw3.lib)
+target_link_libraries(
+	CDGeometry 
+	${CMAKE_CURRENT_SOURCE_DIR}/third/lib/glfw3.lib
+	${CMAKE_CURRENT_SOURCE_DIR}/third/lib/assimp-vc143-mtd.lib
+)
