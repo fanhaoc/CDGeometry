@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "trick.h"
 #include "scene.h"
+#include "geometry/model.h"
 
 class Drawer
 {

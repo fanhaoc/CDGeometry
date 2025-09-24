@@ -10,22 +10,15 @@
 #include "geometryProcess/cubicSpline.h"
 #include "drawer/scene.h"
 #include "drawer/light.h"
+#include "drawer/trick.h"
+#include "drawer/geometry/model.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
+
 int main() {
-	std::cout << "Hello, World!" << std::endl;
-
-	// 设置 dll 搜索目录为 exe 目录下的 dlls 子目录
-	//char buffer[MAX_PATH];
-	//GetModuleFileName(NULL, buffer, MAX_PATH);
-	//std::string exeDir = std::string(buffer);
-	//exeDir = exeDir.substr(0, exeDir.find_last_of("\\/"));
-	//exeDir += "\\bin";
-	//std::cout << exeDir << std::endl;
-
-	//SetDllDirectory(exeDir.c_str());
 
 	Assimp::Importer importer;
 
@@ -44,14 +37,19 @@ int main() {
 	scene->primitives.push_back(lightCube);
 	lightCube->setup();
 	// 添加几何体
-	Primitive* cubeObj = new Primitive();
-	cubeObj->shaderName = "basicTextureShader";
-	cubeObj->textureUrls.emplace_back("container2.png");
-	cubeObj->textureUrls.emplace_back("container2_specular.png");
-	cubeObj->textureUrls.emplace_back("matrix.jpg");
+	//Primitive* cubeObj = new Primitive();
+	//cubeObj->shaderName = "basicTextureShader";
+	//cubeObj->textureUrls.emplace_back("container2.png");
+	//cubeObj->textureUrls.emplace_back("container2_specular.png");
+	//cubeObj->textureUrls.emplace_back("matrix.jpg");
 
-	cubeObj->setup();
-	scene->primitives.push_back(cubeObj);
+	//cubeObj->setup();
+	//scene->primitives.push_back(cubeObj);
+	//加载模型
+
+	Model backbagModel("assets/backpack/backpack.obj");
+	backbagModel.setupShader();
+	scene->models.push_back(&backbagModel);
 
 	drawer->draw();
 

@@ -47,41 +47,53 @@ int Drawer::draw(){
 		//装配view和projection矩阵
 		glm::mat4 viewMatrix;
 		glm::mat4 projMatrix;
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -3.0));
+		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -10.0));
 		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
 
-
-		
-		// 绘制几何体
-		for (Primitive* pri : scene->primitives) {
-			pri->shaderProgram->use();
-
-			unsigned int texture_index = -1;
-			for (unsigned int texture : pri->textures) {
-				
-				glActiveTexture(GL_TEXTURE0 + ++texture_index);
-				glBindTexture(GL_TEXTURE_2D, texture);
-			}
-			glBindVertexArray(pri->VAO);
-
-			
-
+		// 绘制模型
+		for (Model* model : scene->models) {
+			model->shader.use();
 			// 传入view和projection矩阵，光照
-			scene->light->setup(pri->shaderProgram->ID);
-			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
-			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
+			scene->light->setup(model->shader.ID);
+			unsigned int viewLoc = glGetUniformLocation(model->shader.ID, "view");
+			unsigned int projLoc = glGetUniformLocation(model->shader.ID, "projection");
 			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
-			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
+			unsigned int viewPosLoc = glGetUniformLocation(model->shader.ID, "viewPos");
 			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
 
-			
-			
-			pri->update();
+			model->Draw();
 
-			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+
+		
+		//// 绘制几何体
+		//for (Primitive* pri : scene->primitives) {
+		//	pri->shaderProgram->use();
+
+		//	unsigned int texture_index = -1;
+		//	for (unsigned int texture : pri->textures) {
+		//		
+		//		glActiveTexture(GL_TEXTURE0 + ++texture_index);
+		//		glBindTexture(GL_TEXTURE_2D, texture);
+		//	}
+		//	glBindVertexArray(pri->VAO);
+
+		//	
+
+		//	// 传入view和projection矩阵，光照
+		//	scene->light->setup(pri->shaderProgram->ID);
+		//	unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
+		//	unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
+		//	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+		//	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
+		//	unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
+		//	glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
+		//	
+		//	pri->update();
+		//	//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
+		//	glDrawArrays(GL_TRIANGLES, 0, 36);
+		//}
 		glBindVertexArray(0);
 
 		//// 检查并调用事件，交换缓冲

@@ -1,3 +1,4 @@
+#pragma once
 #include <glad/glad.h>
 #include <string>
 #include <fstream>
@@ -9,8 +10,9 @@ class Shader
 public:
 	// 程序ID
 	unsigned int ID;
+	Shader() = default;
 	Shader(const char* vertexPath, const char* fragmentPath, const char* preFragmentPath);
-	~Shader();
+	~Shader() {};
 	// 使用程序
 	void use();
 	// uniform工具函数（有什么用？）
