@@ -1,25 +1,34 @@
 #include "model.h"
 
-void Model::Draw() {
-	unsigned int ambientLoc = glGetUniformLocation(shader.ID, "material.ambient");
+void Model::Draw(unsigned int index) {
+	unsigned int ambientLoc = glGetUniformLocation(shaders[index].ID, "material.ambient");
 	glUniform3fv(ambientLoc, 1, glm::value_ptr(ambient));
-	unsigned int diffuseLoc = glGetUniformLocation(shader.ID, "material.diffuse");
+	unsigned int diffuseLoc = glGetUniformLocation(shaders[index].ID, "material.diffuse");
 	glUniform3fv(diffuseLoc, 1, glm::value_ptr(diffuse));
-	unsigned int specularLoc = glGetUniformLocation(shader.ID, "material.specular");
+	unsigned int specularLoc = glGetUniformLocation(shaders[index].ID, "material.specular");
 	glUniform3fv(specularLoc, 1, glm::value_ptr(specular));
-	unsigned int shininessLoc = glGetUniformLocation(shader.ID, "material.shininess");
+	unsigned int shininessLoc = glGetUniformLocation(shaders[index].ID, "material.shininess");
 	glUniform1f(shininessLoc, shininess);
 
+	glUniformMatrix4fv(glGetUniformLocation(shaders[index].ID, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
 	for (auto mesh : meshes) {
-		mesh.Draw(shader);
+		mesh.Draw(shaders[index]);
 	}
 }
 void Model::setupShader() {
-	std::string vsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".vs");
-	std::string fsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".fs");
-	std::string pre = "drawer/shaders/presetShader.fs";
-	std::string preFsPath = Trick::solvePath(pre);
-	shader =  Shader(vsPath.c_str(), fsPath.c_str(), preFsPath.c_str());
+	for (unsigned int i = 0; i != sizeof(shaderNames) / sizeof(shaderNames[0]); ++i) {
+		std::string vsPath = Trick::solvePath("drawer/shaders/" + shaderNames[i] + ".vs");
+		std::string fsPath = Trick::solvePath("drawer/shaders/" + shaderNames[i] + ".fs");
+		std::string pre = "drawer/shaders/presetShader.fs";
+		std::string preFsPath = Trick::solvePath(pre);
+		shaders[i] = Shader(vsPath.c_str(), fsPath.c_str(), preFsPath.c_str());
+	}
+}
+
+void Model::changeShader(std::string shaderName) {
+	shaderNames[0] = shaderName;
+	setupShader();
 }
 
 void Model::loadModel(std::string path) {

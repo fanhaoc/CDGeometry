@@ -48,7 +48,7 @@ void Mesh::Draw(Shader &shader) {
 	}
 	glActiveTexture(GL_TEXTURE0);
 
-	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "model"),1, GL_FALSE, glm::value_ptr(modelMatrix));
+	/*glUniformMatrix4fv(glGetUniformLocation(shader.ID, "model"),1, GL_FALSE, glm::value_ptr(modelMatrix));*/
 	// »æÖÆÍø¸ñ
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

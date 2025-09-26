@@ -36,4 +36,5 @@ void main()
 	vec3 resColor = c_phong(v_pos, v_normal, defaultMaterail);
 
     FragColor = vec4(resColor, 1.0);
+	FragColor = vec4(resColor, 1.0);
 }

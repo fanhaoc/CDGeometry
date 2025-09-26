@@ -38,32 +38,55 @@ int Drawer::draw(){
 			camera->updateCameraParams();
 		}
 
-		// 渲染指令
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_STENCIL_TEST);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glEnable(GL_CULL_FACE);
+		// 渲染指令
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+		
 
 		//装配view和projection矩阵
 		glm::mat4 viewMatrix;
 		glm::mat4 projMatrix;
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -10.0));
-		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
+		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 1000.0f);
 
 		// 绘制模型
 		for (Model* model : scene->models) {
-			model->shader.use();
+			model->shaders[0].use();
 			// 传入view和projection矩阵，光照
-			scene->light->setup(model->shader.ID);
-			unsigned int viewLoc = glGetUniformLocation(model->shader.ID, "view");
-			unsigned int projLoc = glGetUniformLocation(model->shader.ID, "projection");
+			scene->light->setup(model->shaders[0].ID);
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilMask(0xFF);
+			unsigned int viewLoc = glGetUniformLocation(model->shaders[0].ID, "view");
+			unsigned int projLoc = glGetUniformLocation(model->shaders[0].ID, "projection");
 			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
 			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
-			unsigned int viewPosLoc = glGetUniformLocation(model->shader.ID, "viewPos");
+			unsigned int viewPosLoc = glGetUniformLocation(model->shaders[0].ID, "viewPos");
 			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
+
+			model->modelMatrix = glm::mat4();
 
 			model->Draw();
 
+			model->shaders[1].use();
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+			glStencilMask(0x00);
+			glDisable(GL_DEPTH_TEST);
+			// 传入view和projection矩阵，光照
+			scene->light->setup(model->shaders[1].ID);
+			glUniformMatrix4fv(glGetUniformLocation(model->shaders[1].ID, "view"), 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+			glUniformMatrix4fv(glGetUniformLocation(model->shaders[1].ID, "projection"), 1, GL_FALSE, glm::value_ptr(projMatrix));
+			glUniform3fv(glGetUniformLocation(model->shaders[1].ID, "viewPos"), 1, glm::value_ptr(camera->cameraPos));
+
+			model->modelMatrix = glm::scale(model->modelMatrix, glm::vec3(1.1, 1.1, 1.1));
+
+			model->Draw(1);
+			glStencilMask(0xFF);
+			glEnable(GL_DEPTH_TEST);
 		}
 
 		
