@@ -37,14 +37,14 @@ int main() {
 	scene->primitives.push_back(lightCube);
 	lightCube->setup();
 	// 添加几何体
-	//Primitive* cubeObj = new Primitive();
-	//cubeObj->shaderName = "basicTextureShader";
-	//cubeObj->textureUrls.emplace_back("container2.png");
+	Primitive* cubeObj = new Primitive();
+	cubeObj->shaderName = "basicTextureShader";
+	cubeObj->textureUrls.emplace_back("container2.png");
 	//cubeObj->textureUrls.emplace_back("container2_specular.png");
 	//cubeObj->textureUrls.emplace_back("matrix.jpg");
 
-	//cubeObj->setup();
-	//scene->primitives.push_back(cubeObj);
+	cubeObj->setup();
+	scene->primitives.push_back(cubeObj);
 	//加载模型
 
 	Model backbagModel("assets/backpack/backpack.obj");

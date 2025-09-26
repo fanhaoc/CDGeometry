@@ -41,6 +41,7 @@ public:
 
 	int initWindows();
 	int draw();
+	unsigned int getFrameBuffer();
 	void processInput(GLFWwindow* window);
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 private:
