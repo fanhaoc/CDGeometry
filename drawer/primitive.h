@@ -79,6 +79,7 @@ public:
 	unsigned int VBO;
 	unsigned int EBO;
     std::vector<unsigned int> textures;
+
     // uniform±‰¡ø
     glm::mat4 modelMatrix;
     //glm::vec4 baseColor = glm::vec4(1.0, 1.0, 1.0, 1.0);

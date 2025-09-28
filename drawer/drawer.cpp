@@ -69,7 +69,7 @@ int Drawer::draw(){
 			camera->updateCameraParams();
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_STENCIL_TEST);
@@ -143,54 +143,6 @@ int Drawer::draw(){
 			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
 			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
 			
-			pri->update();
-			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		glBindVertexArray(0);
-
-
-		// 第二阶段绘制
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		//glEnable(GL_CULL_FACE);
-		// 渲染指令
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
-		//装配view和projection矩阵
-		glm::mat4 viewMatrix1;
-		glm::mat4 projMatrix1;
-		viewMatrix1 = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -10.0));
-		projMatrix1 = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 1000.0f);
-
-		// 绘制几何体
-
-		for (Primitive* pri : scene->primitives) {
-			pri->shaderProgram->use();
-
-			unsigned int texture_index = -1;
-			for (unsigned int texture : pri->textures) {
-				if (texture_index == -1) { texture = fbTexture; }
-				glActiveTexture(GL_TEXTURE0 + ++texture_index);
-				glBindTexture(GL_TEXTURE_2D, texture);
-			}
-			glBindVertexArray(pri->VAO);
-
-
-
-			// 传入view和projection矩阵，光照
-			scene->light->setup(pri->shaderProgram->ID);
-			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
-			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
-			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix1));
-			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
-			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
-
 			pri->update();
 			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
