@@ -47,9 +47,9 @@ int main() {
 	scene->primitives.push_back(cubeObj);
 	//¼ÓÔØÄ£ĞÍ
 
-	Model backbagModel("assets/backpack/backpack.obj");
-	backbagModel.setupShader();
-	scene->models.push_back(&backbagModel);
+	//Model backbagModel("assets/backpack/backpack.obj");
+	//backbagModel.setupShader();
+	//scene->models.push_back(&backbagModel);
 
 	drawer->draw();
 

@@ -38,6 +38,9 @@ public:
 
 	Scene* scene;
 
+	unsigned int framebuffer;
+	unsigned int fbTexture;
+
 
 	int initWindows();
 	int draw();

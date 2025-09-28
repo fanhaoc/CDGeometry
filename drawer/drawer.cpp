@@ -24,11 +24,9 @@ int Drawer::initWindows(){
 }
 
 unsigned int Drawer::getFrameBuffer() {
-	unsigned int framebuffer;
 	glGenFramebuffers(1, &framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 	// 生成纹理附加到帧缓冲上
-	unsigned int fbTexture;
 	glGenTextures(1, &fbTexture);
 	glBindTexture(GL_TEXTURE_2D, fbTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB,GL_UNSIGNED_BYTE,NULL);
@@ -42,8 +40,11 @@ unsigned int Drawer::getFrameBuffer() {
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
@@ -53,6 +54,7 @@ unsigned int Drawer::getFrameBuffer() {
 
 int Drawer::draw(){
 	glfwSetCursorPosCallback(window, mouse_callback);
+	getFrameBuffer();
 	while (!glfwWindowShouldClose(window))
 	{
 		// 计算帧时间
@@ -67,13 +69,14 @@ int Drawer::draw(){
 			camera->updateCameraParams();
 		}
 
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_STENCIL_TEST);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 		//glEnable(GL_CULL_FACE);
 		// 渲染指令
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		
 
@@ -120,6 +123,7 @@ int Drawer::draw(){
 
 		
 		// 绘制几何体
+		
 		for (Primitive* pri : scene->primitives) {
 			pri->shaderProgram->use();
 
@@ -130,9 +134,6 @@ int Drawer::draw(){
 				glBindTexture(GL_TEXTURE_2D, texture);
 			}
 			glBindVertexArray(pri->VAO);
-
-			
-
 			// 传入view和projection矩阵，光照
 			scene->light->setup(pri->shaderProgram->ID);
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
@@ -147,6 +148,56 @@ int Drawer::draw(){
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		glBindVertexArray(0);
+
+
+		// 第二阶段绘制
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		//glEnable(GL_CULL_FACE);
+		// 渲染指令
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+
+		//装配view和projection矩阵
+		glm::mat4 viewMatrix1;
+		glm::mat4 projMatrix1;
+		viewMatrix1 = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -10.0));
+		projMatrix1 = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 1000.0f);
+
+		// 绘制几何体
+
+		for (Primitive* pri : scene->primitives) {
+			pri->shaderProgram->use();
+
+			unsigned int texture_index = -1;
+			for (unsigned int texture : pri->textures) {
+				if (texture_index == -1) { texture = fbTexture; }
+				glActiveTexture(GL_TEXTURE0 + ++texture_index);
+				glBindTexture(GL_TEXTURE_2D, texture);
+			}
+			glBindVertexArray(pri->VAO);
+
+
+
+			// 传入view和projection矩阵，光照
+			scene->light->setup(pri->shaderProgram->ID);
+			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
+			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix1));
+			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
+			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
+
+			pri->update();
+			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		glBindVertexArray(0);
+
+		
 
 		//// 检查并调用事件，交换缓冲
 		glfwPollEvents();
