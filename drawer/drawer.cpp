@@ -130,6 +130,10 @@ int Drawer::draw(){
 
 		
 		// 绘制几何体
+		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projMatrix));
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->viewMatrix));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		
 		for (Primitive* pri : scene->primitives) {
 			pri->shaderProgram->use();
@@ -152,15 +156,9 @@ int Drawer::draw(){
 			// 传入view和projection矩阵，光照
 			scene->light->setup(pri->shaderProgram->ID);
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
-			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
 			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
 			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
-			//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
-			//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
-			glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projMatrix));
-			glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->viewMatrix));
-			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 
 			if (pri->textureType == 1) {
 				glm::mat4 viewnew = glm::mat4(glm::mat3(camera->viewMatrix));
@@ -172,7 +170,13 @@ int Drawer::draw(){
 			
 			pri->update();
 			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			if (pri->isInstance) {
+				glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 100);
+			}
+			else {
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
+			
 		}
 		glBindVertexArray(0);
 

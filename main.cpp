@@ -42,7 +42,7 @@ int main() {
 	cubeObj->textureUrls.emplace_back("container2.png");
 	//cubeObj->textureUrls.emplace_back("container2_specular.png");
 	//cubeObj->textureUrls.emplace_back("matrix.jpg");
-
+	cubeObj->isInstance = true;
 	cubeObj->setup();
 	scene->primitives.push_back(cubeObj);
 	// Ìì¿ÕºĞ

@@ -41,12 +41,31 @@ int Primitive::setupBuffer() {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 	}
+	
 
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	indicesSize = sizeof(indices) / sizeof(unsigned int);
+
+	// instance
+	float offset = 1.0;
+	for (unsigned int i = 0; i < 100; i++) {
+		glm::vec3 trans;
+		trans.x = (float(i) - 50.0) * offset;
+		trans.y = 0.0;
+		trans.z = (float(i) - 50.0) * offset;
+		instanceTranslation[i] = trans;
+	}
+	unsigned int instanceVBO;
+	glGenBuffers(1, &instanceVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * 100, instanceTranslation, GL_STATIC_DRAW);
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(5);
+	glVertexAttribDivisor(5, 1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	return 0;
 }
 
@@ -136,6 +155,7 @@ int Primitive::setupUniform() {
 	
 
 	glUniform1i(glGetUniformLocation(shaderProgram->ID, "skybox"), 0);
+
 	return 1;
 }
 

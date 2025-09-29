@@ -80,9 +80,11 @@ public:
         1.0f, 0.0f, // 右下角
         0.5f, 1.0f  // 上中
     };
+    glm::vec3 instanceTranslation[100];
 
     Vertices_Type Vtype = POSITION_NORMAL_TEXTURE;
     unsigned int textureType = 0; // 0二维贴图。1三维贴图
+    bool isInstance = false;
 
 	unsigned int VAO;
 	unsigned int VBO;
