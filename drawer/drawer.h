@@ -40,6 +40,7 @@ public:
 
 	unsigned int framebuffer;
 	unsigned int fbTexture;
+	unsigned int UBO;
 
 
 	int initWindows();

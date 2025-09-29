@@ -12,6 +12,12 @@
 #include "shaders/shader.h"
 #include "trick.h"
 
+enum Vertices_Type
+{
+    POSITION_NORMAL_TEXTURE,
+    POSITION
+};
+
 class Primitive
 {
 public:
@@ -75,6 +81,9 @@ public:
         0.5f, 1.0f  // 上中
     };
 
+    Vertices_Type Vtype = POSITION_NORMAL_TEXTURE;
+    unsigned int textureType = 0; // 0二维贴图。1三维贴图
+
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int EBO;
@@ -98,6 +107,7 @@ public:
 	int setupBuffer();
     int setupShader();
     int setupTexture();
+    void skyTexture();
     int setupUniform();
     void update();
 

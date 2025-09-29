@@ -55,6 +55,13 @@ unsigned int Drawer::getFrameBuffer() {
 int Drawer::draw(){
 	glfwSetCursorPosCallback(window, mouse_callback);
 	getFrameBuffer();
+	// 创建ubo
+	glGenBuffers(1, &UBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, 2 * sizeof(glm::mat4));
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// 计算帧时间
@@ -126,22 +133,42 @@ int Drawer::draw(){
 		
 		for (Primitive* pri : scene->primitives) {
 			pri->shaderProgram->use();
+			// 设置matrices uniform块绑定到0
+			unsigned int uniformBlockMatrices = glGetUniformBlockIndex(pri->shaderProgram->ID, "Matrices");
+			glUniformBlockBinding(pri->shaderProgram->ID, uniformBlockMatrices, 0);
 
 			unsigned int texture_index = -1;
 			for (unsigned int texture : pri->textures) {
-				
 				glActiveTexture(GL_TEXTURE0 + ++texture_index);
-				glBindTexture(GL_TEXTURE_2D, texture);
+				if (pri->textureType == 0) {
+					glBindTexture(GL_TEXTURE_2D, texture);
+				}
+				else {
+					glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+				}
+				
 			}
 			glBindVertexArray(pri->VAO);
 			// 传入view和projection矩阵，光照
 			scene->light->setup(pri->shaderProgram->ID);
 			unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
 			unsigned int projLoc = glGetUniformLocation(pri->shaderProgram->ID, "projection");
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
-			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
 			unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
 			glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
+			//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMatrix));
+			//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera->viewMatrix));
+			glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projMatrix));
+			glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->viewMatrix));
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+			if (pri->textureType == 1) {
+				glm::mat4 viewnew = glm::mat4(glm::mat3(camera->viewMatrix));
+				glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewnew));
+			}
+			
+			
+
 			
 			pri->update();
 			//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);

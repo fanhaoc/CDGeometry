@@ -4,8 +4,10 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexcoord;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+layout (std140) uniform Matrices {
+	mat4 projection;
+	mat4 view;
+};
 
 out vec3 v_pos;
 out vec3 v_normal;

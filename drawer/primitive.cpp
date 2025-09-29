@@ -10,7 +10,13 @@ int Primitive::setup() {
 	setupShader();
 	setupBuffer();
 	setupUniform();
-	setupTexture();
+	if (textureType == 0) {
+		setupTexture();
+	}
+	else if (textureType == 1) {
+		skyTexture();
+	}
+	
 	return 1;
 }
 
@@ -22,12 +28,19 @@ int Primitive::setupBuffer() {
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+
+	if (Vtype == 0) {
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+	}
+	else if (Vtype == 1) {
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+	}
 
 	glGenBuffers(1, &EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -76,6 +89,33 @@ int Primitive::setupTexture() {
 	return 1;
 }
 
+void Primitive::skyTexture() {
+	unsigned int texture2D;
+	glGenTextures(1, &texture2D);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture2D);
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i != textureUrls.size(); ++i) {
+		std::string image = "assets/" + textureUrls[i];
+		auto rgbFormat = GL_RGB;
+		if (textureUrls[i].find(".png") != std::string::npos) { rgbFormat = GL_RGBA; }
+		std::string imagePath = Trick::solvePath(image);
+		unsigned char* data = stbi_load(imagePath.c_str(), &width, &height, &nrChannels, 0);
+		if (data) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, rgbFormat, width, height, 0, rgbFormat, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}else{
+			std::cout << "Cubemap texture failed to load at path: " << textureUrls[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	textures.push_back(texture2D);
+}
+
 int Primitive::setupUniform() {
 	shaderProgram->use();
 	// 基础颜色和模型矩阵
@@ -94,6 +134,8 @@ int Primitive::setupUniform() {
 	glUniform1i(glGetUniformLocation(shaderProgram->ID, "u_texture1"), 1);
 	glUniform1i(glGetUniformLocation(shaderProgram->ID, "u_texture2"), 2);
 	
+
+	glUniform1i(glGetUniformLocation(shaderProgram->ID, "skybox"), 0);
 	return 1;
 }
 
@@ -105,6 +147,4 @@ void Primitive::update() {
 	//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 	//glm::mat4 modelMatrix;
 	//modelMatrix = glm::rotate(modelMatrix, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-
 }
