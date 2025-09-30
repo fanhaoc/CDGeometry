@@ -25,5 +25,5 @@ void main(){
 	vec3 normal = normalize(v_normal);
 	vec3 resColor = c_phong(v_pos, normal);
 
-	FragColor = vec4(resColor, 1.0);
+	FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

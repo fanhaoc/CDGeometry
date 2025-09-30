@@ -9,6 +9,7 @@
 #include "trick.h"
 #include "scene.h"
 #include "geometry/model.h"
+#include "primitives/superPrimitive.h"
 
 class Drawer
 {
@@ -34,6 +35,7 @@ public:
 	//glm::mat4 viewMatrix;
 	//glm::mat4 projMatrix;
 	std::vector<Primitive*> primitives;
+	std::vector<SuperPrimitive*> sps;
 	Camera* camera = new Camera();
 
 	Scene* scene;

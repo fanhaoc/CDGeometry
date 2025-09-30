@@ -12,6 +12,8 @@
 #include "drawer/light.h"
 #include "drawer/trick.h"
 #include "drawer/geometry/model.h"
+#include "drawer/primitives/superPrimitive.h"
+#include "drawer/primitives/boxPrimitive.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -34,40 +36,25 @@ int main() {
 	glfwSetFramebufferSizeCallback(drawer->window, framebuffer_size_callback);
 	// 添加灯光物体
 	Primitive* lightCube = light->debugLightCube();
-	scene->primitives.push_back(lightCube);
+	//scene->primitives.push_back(lightCube);
 	lightCube->setup();
-	// 添加几何体
-	Primitive* cubeObj = new Primitive();
-	cubeObj->shaderName = "basicTextureShader";
-	cubeObj->textureUrls.emplace_back("container2.png");
-	//cubeObj->textureUrls.emplace_back("container2_specular.png");
-	//cubeObj->textureUrls.emplace_back("matrix.jpg");
-	cubeObj->isInstance = true;
+	//// 添加几何体
+	//Primitive* cubeObj = new Primitive();
+	//cubeObj->shaderName = "basicTextureShader";
+	//cubeObj->textureUrls.emplace_back("container2.png");
+	//cubeObj->isInstance = true;
+	//cubeObj->setup();
+	//scene->primitives.push_back(cubeObj);
+	SuperPrimitive* cubeObj = new BoxPrimitive();
 	cubeObj->setup();
-	scene->primitives.push_back(cubeObj);
-	// 天空盒
-	Primitive* skybox = new Primitive();
-	skybox->shaderName = "skyboxShader";
-
-	skybox->textureUrls.emplace_back("/skybox/right.jpg");
-	skybox->textureUrls.emplace_back("/skybox/left.jpg");
-	skybox->textureUrls.emplace_back("/skybox/top.jpg");
-	skybox->textureUrls.emplace_back("/skybox/bottom.jpg");
-	skybox->textureUrls.emplace_back("/skybox/front.jpg");
-	skybox->textureUrls.emplace_back("/skybox/back.jpg");
-	skybox->Vtype = POSITION;
-	skybox->textureType = 1;
-	skybox->modelMatrix = glm::scale(skybox->modelMatrix, glm::vec3(20, 20, 20));
-	skybox->setup();
-	scene->primitives.push_back(skybox);
-
+	drawer->sps.push_back(cubeObj);
 
 	//加载模型
 
 	//Model backbagModel("assets/backpack/backpack.obj");
 	//backbagModel.setupShader();
 	//scene->models.push_back(&backbagModel);
-	std::cout << GL_MAX_VERTEX_UNIFORM_COMPONENTS << std::endl;
+	std::cout << cubeObj->shader->ID << std::endl;
 
 	drawer->draw();
 
