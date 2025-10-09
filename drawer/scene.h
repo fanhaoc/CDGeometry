@@ -1,5 +1,5 @@
 #pragma once
-#include "primitive.h"
+#include "primitives/superPrimitive.h"
 #include "light.h"
 #include "geometry/model.h"
 #include <vector>
@@ -9,7 +9,7 @@ public:
 	Scene() {};
 	~Scene() {};
 	
-	std::vector<Primitive*> primitives;
+	std::vector<SuperPrimitive*> primitives;
 	std::vector<Model*> models;
 	Light* light;
 	

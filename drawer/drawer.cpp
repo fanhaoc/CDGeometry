@@ -90,7 +90,7 @@ int Drawer::draw(){
 		//装配view和projection矩阵
 		glm::mat4 viewMatrix;
 		glm::mat4 projMatrix;
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 0.0, -10.0));
+		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 1.0, 80.0));
 		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 1000.0f);
 
 		
@@ -100,7 +100,7 @@ int Drawer::draw(){
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->viewMatrix));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		for (SuperPrimitive* sp : sps) {
+		for (SuperPrimitive* sp : scene->primitives) {
 			sp->shader->use();
 			glBindVertexArray(sp->VAO);
 			// 设置matrices uniform块绑定到0

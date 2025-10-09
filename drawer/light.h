@@ -4,7 +4,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "primitive.h"
 #include "primitives/boxPrimitive.h"
 #include "primitives/superPrimitive.h"
 

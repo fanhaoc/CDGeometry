@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -5,8 +6,8 @@
 #include <assimp/Importer.hpp>
 #include <Windows.h>
 
+
 #include "drawer/drawer.h"
-#include "drawer/primitive.h"
 #include "geometryProcess/cubicSpline.h"
 #include "drawer/scene.h"
 #include "drawer/light.h"
@@ -14,6 +15,9 @@
 #include "drawer/geometry/model.h"
 #include "drawer/primitives/superPrimitive.h"
 #include "drawer/primitives/boxPrimitive.h"
+#include "drawer/primitives/planePrimitive.h"
+
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -26,7 +30,7 @@ int main() {
 
 	Scene* scene = new Scene();
 
-	Light* light = new Light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(1.0, 1.0, 1.0));
+	Light* light = new Light(glm::vec3(1.2f, 2.0f, 2.0f), glm::vec3(1.0, 1.0, 1.0));
 	scene->light = light;
 		
 
@@ -39,12 +43,27 @@ int main() {
 	//scene->primitives.push_back(lightCube);
 	
 	lightCube->setup();
-	drawer->sps.push_back(lightCube);
+	scene->primitives.push_back(lightCube);
 
 	SuperPrimitive* cubeObj = new BoxPrimitive();
 	cubeObj->shaderName = "phongColorShader";
+	cubeObj->modelMatrix = glm::translate(cubeObj->modelMatrix, glm::vec3(2.0, 1.0, -1.0));
 	cubeObj->setup();
-	drawer->sps.push_back(cubeObj);
+	scene->primitives.push_back(cubeObj);
+
+
+	SuperPrimitive* cubeObj02 = new BoxPrimitive();
+	cubeObj02->shaderName = "phongColorShader";
+	// 向z方向平移
+	cubeObj02->modelMatrix = glm::translate(cubeObj02->modelMatrix, glm::vec3(-1.0, 0.5, 0.0));
+	cubeObj02->setup();
+	scene->primitives.push_back(cubeObj02);
+
+	// 地面
+	SuperPrimitive* planeObj = new PlanePrimitive();
+	planeObj->modelMatrix = glm::scale(planeObj->modelMatrix, glm::vec3(10.0, 0.0, 10.0));
+	planeObj->setup();
+	scene->primitives.push_back(planeObj);
 
 	//加载模型
 
