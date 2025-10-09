@@ -82,7 +82,7 @@ int Drawer::draw(){
 		//glEnable(GL_STENCIL_TEST);
 		//glEnable(GL_CULL_FACE);
 		// 渲染指令
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.5f, 0.4f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		
@@ -106,51 +106,10 @@ int Drawer::draw(){
 			// 设置matrices uniform块绑定到0
 			unsigned int uniformBlockMatrices = glGetUniformBlockIndex(sp->shader->ID, "Matrices");
 			glUniformBlockBinding(sp->shader->ID, uniformBlockMatrices, 0);
-
+			glUniform3fv(glGetUniformLocation(sp->shader->ID, "viewPos"), 1, glm::value_ptr(camera->cameraPos));
 			scene->light->setup(sp->shader->ID);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		
-		//for (Primitive* pri : scene->primitives) {
-		//	pri->shaderProgram->use();
-		//	glBindVertexArray(pri->VAO);
-		//	// 设置matrices uniform块绑定到0
-		//	unsigned int uniformBlockMatrices = glGetUniformBlockIndex(pri->shaderProgram->ID, "Matrices");
-		//	glUniformBlockBinding(pri->shaderProgram->ID, uniformBlockMatrices, 0);
-
-		//	unsigned int texture_index = -1;
-		//	for (unsigned int texture : pri->textures) {
-		//		glActiveTexture(GL_TEXTURE0 + ++texture_index);
-		//		if (pri->textureType == 0) {
-		//			glBindTexture(GL_TEXTURE_2D, texture);
-		//		}
-		//		else {
-		//			glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-		//		}
-		//		
-		//	}
-		//	
-		//	// 传入view和projection矩阵，光照
-		//	scene->light->setup(pri->shaderProgram->ID);
-		//	unsigned int viewLoc = glGetUniformLocation(pri->shaderProgram->ID, "view");
-		//	unsigned int viewPosLoc = glGetUniformLocation(pri->shaderProgram->ID, "viewPos");
-		//	glUniform3fv(viewPosLoc, 1, glm::value_ptr(camera->cameraPos));
-
-
-		//	if (pri->textureType == 1) {
-		//		glm::mat4 viewnew = glm::mat4(glm::mat3(camera->viewMatrix));
-		//		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewnew));
-		//	}
-		//	pri->update();
-		//	//glDrawElements(GL_TRIANGLES, pri->indicesSize, GL_UNSIGNED_INT, 0);
-		//	if (pri->isInstance) {
-		//		glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 100);
-		//	}
-		//	else {
-		//		glDrawArrays(GL_TRIANGLES, 0, 36);
-		//	}
-		//	
-		//}
 		glBindVertexArray(0);
 
 		

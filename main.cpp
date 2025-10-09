@@ -27,25 +27,22 @@ int main() {
 	Scene* scene = new Scene();
 
 	Light* light = new Light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(1.0, 1.0, 1.0));
-
 	scene->light = light;
 		
 
 	Drawer *drawer =new Drawer(scene);
 	drawer->initWindows();
 	glfwSetFramebufferSizeCallback(drawer->window, framebuffer_size_callback);
+
 	// 添加灯光物体
-	Primitive* lightCube = light->debugLightCube();
+	SuperPrimitive* lightCube = light->debugLightCube();
 	//scene->primitives.push_back(lightCube);
+	
 	lightCube->setup();
-	//// 添加几何体
-	//Primitive* cubeObj = new Primitive();
-	//cubeObj->shaderName = "basicTextureShader";
-	//cubeObj->textureUrls.emplace_back("container2.png");
-	//cubeObj->isInstance = true;
-	//cubeObj->setup();
-	//scene->primitives.push_back(cubeObj);
+	drawer->sps.push_back(lightCube);
+
 	SuperPrimitive* cubeObj = new BoxPrimitive();
+	cubeObj->shaderName = "phongColorShader";
 	cubeObj->setup();
 	drawer->sps.push_back(cubeObj);
 

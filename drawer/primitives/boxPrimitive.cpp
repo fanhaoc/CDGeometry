@@ -37,6 +37,7 @@ void BoxPrimitive::setupVertexBuffer() {
 }
 
 void BoxPrimitive::setupUniforms() {
+	shader->use();
 	glUniform3fv(glGetUniformLocation(shader->ID, "material.ambient"), 1, glm::value_ptr(ambient));
 	glUniform3fv(glGetUniformLocation(shader->ID, "material.diffuse"), 1, glm::value_ptr(diffuse));
 	glUniform3fv(glGetUniformLocation(shader->ID, "material.specular"), 1, glm::value_ptr(specular));

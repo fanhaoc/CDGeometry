@@ -20,8 +20,8 @@ void Light::setup(unsigned int ID) {
 	glUniform1f(glGetUniformLocation(ID, "light.quadratic"), quadratic);
 }
 
-Primitive* Light::debugLightCube() {
-	Primitive* lightCube = new Primitive();
+SuperPrimitive* Light::debugLightCube() {
+	SuperPrimitive* lightCube = new BoxPrimitive();
 	lightCube->shaderName = "basicColorShader";
 	lightCube->modelMatrix = glm::translate(lightCube->modelMatrix, lightPos);
 	lightCube->modelMatrix = glm::scale(lightCube->modelMatrix, glm::vec3(0.2f));

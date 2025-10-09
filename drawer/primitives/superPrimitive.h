@@ -25,9 +25,9 @@ public:
 
 	glm::mat4 modelMatrix;
 	// Ä¬ÈÏÑÕÉ«ÊôÐÔ
-	glm::vec3 ambient = glm::vec3(1.0, 1.0, 1.0);
-	glm::vec3 diffuse = glm::vec3(1.0, 1.0, 1.0);
-	glm::vec3 specular = glm::vec3(1.0, 1.0, 1.0);
+	glm::vec3 ambient = glm::vec3(0.5, 0.5, 0.5);
+	glm::vec3 diffuse = glm::vec3(0.8, 0.5, 0.5);
+	glm::vec3 specular = glm::vec3(0.5, 0.5, 0.5);
 	float shininess = 32.0f;
 
 	virtual void setup() {

@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 
 #include "primitive.h"
+#include "primitives/boxPrimitive.h"
+#include "primitives/superPrimitive.h"
 
 class Light
 {
@@ -23,7 +25,7 @@ public:
 	float quadratic = 0.0075;
 
 	void setup(unsigned int ID);
-	Primitive* debugLightCube();
+	SuperPrimitive* debugLightCube();
 private:
 
 };
