@@ -8,7 +8,7 @@ void PlanePrimitive::setup() {
 	std::cout << "plane" << std::endl;
 	setupShader();
 	setupVertexBuffer();
-	setupUniforms();
+	//setupUniforms();
 	setupTextures();
 }
 
@@ -18,6 +18,12 @@ void PlanePrimitive::setupShader() {
 	std::string pre = "drawer/shaders/presetShader.fs";
 	std::string preFsPath = Trick::solvePath(pre);
 	shader = new Shader(vsPath.c_str(), fsPath.c_str(), preFsPath.c_str());
+
+	std::string vsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".vs");
+	std::string fsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".fs");
+	std::string pre01 = "drawer/shaders/presetShader.fs";
+	std::string preFsPath01 = Trick::solvePath(pre01);
+	shadowShader = new Shader(vsPath_01.c_str(), fsPath_01.c_str(), preFsPath01.c_str());
 }
 
 void PlanePrimitive::setupVertexBuffer() {
@@ -36,13 +42,13 @@ void PlanePrimitive::setupVertexBuffer() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void PlanePrimitive::setupUniforms() {
-	shader->use();
-	glUniform3fv(glGetUniformLocation(shader->ID, "material.ambient"), 1, glm::value_ptr(ambient));
-	glUniform3fv(glGetUniformLocation(shader->ID, "material.diffuse"), 1, glm::value_ptr(diffuse));
-	glUniform3fv(glGetUniformLocation(shader->ID, "material.specular"), 1, glm::value_ptr(specular));
-	glUniform1f(glGetUniformLocation(shader->ID, "material.shininess"), shininess);
-	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+void PlanePrimitive::setupUniforms(Shader* shaderq) {
+	shaderq->use();
+	glUniform3fv(glGetUniformLocation(shaderq->ID, "material.ambient"), 1, glm::value_ptr(ambient));
+	glUniform3fv(glGetUniformLocation(shaderq->ID, "material.diffuse"), 1, glm::value_ptr(diffuse));
+	glUniform3fv(glGetUniformLocation(shaderq->ID, "material.specular"), 1, glm::value_ptr(specular));
+	glUniform1f(glGetUniformLocation(shaderq->ID, "material.shininess"), shininess);
+	glUniformMatrix4fv(glGetUniformLocation(shaderq->ID, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
 }
 
 void PlanePrimitive::setupTextures() {

@@ -22,6 +22,7 @@ public:
 	GLFWwindow* window;
 	float screenWidth = 800;
 	float screenHeight = 600;
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	float lastFrame = 0.0; //上一帧的时间
 	float deltaFrame = 0.0; //这一帧和上一帧的时间差
 
@@ -38,14 +39,12 @@ public:
 
 	Scene* scene;
 
-	unsigned int framebuffer;
-	unsigned int fbTexture;
 	unsigned int UBO;
-
 
 	int initWindows();
 	int draw();
-	unsigned int getFrameBuffer();
+	void drawPrimitives(const unsigned int& fb, const unsigned int& shadowMap);
+	void getFrameBuffer(unsigned int& framebuffer, unsigned int& fbTexture);
 	void processInput(GLFWwindow* window);
 	static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 private:

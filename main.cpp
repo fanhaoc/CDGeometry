@@ -38,16 +38,16 @@ int main() {
 	drawer->initWindows();
 	glfwSetFramebufferSizeCallback(drawer->window, framebuffer_size_callback);
 
-	// 添加灯光物体
-	SuperPrimitive* lightCube = light->debugLightCube();
+	//// 添加灯光物体
+	//SuperPrimitive* lightCube = light->debugLightCube();
+	////scene->primitives.push_back(lightCube);
+	//
+	//lightCube->setup();
 	//scene->primitives.push_back(lightCube);
-	
-	lightCube->setup();
-	scene->primitives.push_back(lightCube);
 
 	SuperPrimitive* cubeObj = new BoxPrimitive();
 	cubeObj->shaderName = "phongColorShader";
-	cubeObj->modelMatrix = glm::translate(cubeObj->modelMatrix, glm::vec3(2.0, 1.0, -1.0));
+	cubeObj->modelMatrix = glm::translate(cubeObj->modelMatrix, glm::vec3(0.0, 1.0, -1.0));
 	cubeObj->setup();
 	scene->primitives.push_back(cubeObj);
 
@@ -61,7 +61,11 @@ int main() {
 
 	// 地面
 	SuperPrimitive* planeObj = new PlanePrimitive();
-	planeObj->modelMatrix = glm::scale(planeObj->modelMatrix, glm::vec3(10.0, 0.0, 10.0));
+	planeObj->shaderName = "phongColorShader";
+	planeObj->diffuse = glm::vec3(1.0, 1.0, 1.0); 
+	planeObj->ambient = glm::vec3(1.0, 1.0, 1.0);
+	planeObj->specular = glm::vec3(1.0, 1.0, 1.0);
+	planeObj->modelMatrix = glm::scale(planeObj->modelMatrix, glm::vec3(10.0, 1.0, 10.0));
 	planeObj->setup();
 	scene->primitives.push_back(planeObj);
 

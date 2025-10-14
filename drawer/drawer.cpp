@@ -23,43 +23,69 @@ int Drawer::initWindows(){
 	return 0;
 }
 
-unsigned int Drawer::getFrameBuffer() {
+void Drawer::getFrameBuffer(unsigned int &framebuffer, unsigned int &fbTexture) {
+
 	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	
 	// 生成纹理附加到帧缓冲上
 	glGenTextures(1, &fbTexture);
 	glBindTexture(GL_TEXTURE_2D, fbTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB,GL_UNSIGNED_BYTE,NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+	// 设置边界颜色，让超出光视锥的部分不被阴影覆盖
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 	// 将纹理附加到帧缓冲对象
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fbTexture, 0);
+	// 不渲染任何颜色
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
 
-	// 渲染缓冲对象
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	//// 渲染缓冲对象
+	//unsigned int rbo;
+	//glGenRenderbuffers(1, &rbo);
+	//glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	//
+	//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	//glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	//
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//	std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+
+	// 重要：检查帧缓冲完整性
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+		std::cout << "ERROR::FRAMEBUFFER:: Shadow Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	return framebuffer;
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 int Drawer::draw(){
 	glfwSetCursorPosCallback(window, mouse_callback);
-	getFrameBuffer();
+	unsigned int framebuffer, fbTexture;
+	getFrameBuffer(framebuffer, fbTexture);
 	// 创建ubo
 	glGenBuffers(1, &UBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, 2 * sizeof(glm::mat4));
+	glBufferData(GL_UNIFORM_BUFFER, 3 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, UBO, 0, 3 * sizeof(glm::mat4));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	// 计算lightspacematrix
+	glm::mat4 lightProjection, lightView;
+	glm::mat4 lightSpaceMatrix;
+	//lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f);
+	lightProjection = glm::perspective(glm::radians(75.0f), 1.0f, 0.1f, 10.0f);
+	lightView = glm::lookAt(scene->light->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
+	lightSpaceMatrix = lightProjection * lightView;
+	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(lightSpaceMatrix));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	while (!glfwWindowShouldClose(window))
@@ -74,18 +100,7 @@ int Drawer::draw(){
 		if (!Trick::almostEqual(cameraFront, camera->cameraFront)){
 			camera->cameraFront = cameraFront;
 			camera->updateCameraParams();
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		glEnable(GL_DEPTH_TEST);
-		//glEnable(GL_STENCIL_TEST);
-		//glEnable(GL_CULL_FACE);
-		// 渲染指令
-		glClearColor(0.5f, 0.4f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		
+		}	
 
 		//装配view和projection矩阵
 		glm::mat4 viewMatrix;
@@ -93,26 +108,19 @@ int Drawer::draw(){
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0, 1.0, 80.0));
 		projMatrix = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 1000.0f);
 
-		
-		// 绘制几何体
+		// 绑定ubo，并更新数据
 		glBindBuffer(GL_UNIFORM_BUFFER, UBO);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projMatrix));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera->viewMatrix));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		for (SuperPrimitive* sp : scene->primitives) {
-			sp->shader->use();
-			glBindVertexArray(sp->VAO);
-			// 设置matrices uniform块绑定到0
-			unsigned int uniformBlockMatrices = glGetUniformBlockIndex(sp->shader->ID, "Matrices");
-			glUniformBlockBinding(sp->shader->ID, uniformBlockMatrices, 0);
-			glUniform3fv(glGetUniformLocation(sp->shader->ID, "viewPos"), 1, glm::value_ptr(camera->cameraPos));
-			scene->light->setup(sp->shader->ID);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-		glBindVertexArray(0);
-
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		
+		drawPrimitives(framebuffer, fbTexture);
+		
+		glViewport(0, 0, screenWidth, screenHeight);
+		drawPrimitives(0, fbTexture);
+
 
 		//// 检查并调用事件，交换缓冲
 		glfwPollEvents();
@@ -121,6 +129,51 @@ int Drawer::draw(){
 	glfwTerminate();
 	return 0;
 }
+
+void Drawer::drawPrimitives(const unsigned int &fb, const unsigned int &shadowMap) {
+
+	// 状态切换
+	glBindFramebuffer(GL_FRAMEBUFFER, fb);
+	glEnable(GL_DEPTH_TEST);
+	if (fb == 0) {
+		glCullFace(GL_BACK);
+	}
+	else {
+		glCullFace(GL_FRONT);
+	}
+	//glEnable(GL_STENCIL_TEST);
+	//glEnable(GL_CULL_FACE);
+	// 渲染指令
+	glClearColor(0.5f, 0.4f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	for (SuperPrimitive* sp : scene->primitives) {
+		Shader* shaderPtr = nullptr;
+		if (fb == 0) {
+			sp->shader->use();
+			shaderPtr = sp->shader;
+			// 传入shadowMap
+			glActiveTexture(GL_TEXTURE10);
+			glBindTexture(GL_TEXTURE_2D, shadowMap);
+			glUniform1i(glGetUniformLocation(shaderPtr->ID, "shadowMap"), 10);
+		}
+		else {
+			sp->shadowShader->use();
+			shaderPtr = sp->shadowShader;
+		}
+		glBindVertexArray(sp->VAO);
+
+		sp->setupUniforms(shaderPtr);
+
+		// 设置matrices uniform块绑定到0
+		unsigned int uniformBlockMatrices = glGetUniformBlockIndex(shaderPtr->ID, "Matrices");
+		glUniformBlockBinding(shaderPtr->ID, uniformBlockMatrices, 0);
+		glUniform3fv(glGetUniformLocation(shaderPtr->ID, "viewPos"), 1, glm::value_ptr(camera->cameraPos));
+		scene->light->setup(shaderPtr->ID);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+}
+
 void Drawer::processInput(GLFWwindow* window)
 {
 	float cameraSpeed = deltaFrame;

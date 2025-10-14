@@ -8,7 +8,7 @@ void BoxPrimitive::setup(){
 	std::cout << "box" << std::endl;
 	setupShader();
 	setupVertexBuffer();
-	setupUniforms();
+	//setupUniforms();
 	setupTextures();
 }
 
@@ -18,6 +18,10 @@ void BoxPrimitive::setupShader() {
 	std::string pre = "drawer/shaders/presetShader.fs";
 	std::string preFsPath = Trick::solvePath(pre);
 	shader = new Shader(vsPath.c_str(), fsPath.c_str(), preFsPath.c_str());
+
+	std::string vsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".vs");
+	std::string fsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".fs");
+	shadowShader = new Shader(vsPath_01.c_str(), fsPath_01.c_str(), preFsPath.c_str());
 }
 
 void BoxPrimitive::setupVertexBuffer() {
@@ -36,7 +40,7 @@ void BoxPrimitive::setupVertexBuffer() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void BoxPrimitive::setupUniforms() {
+void BoxPrimitive::setupUniforms(Shader *shader) {
 	shader->use();
 	glUniform3fv(glGetUniformLocation(shader->ID, "material.ambient"), 1, glm::value_ptr(ambient));
 	glUniform3fv(glGetUniformLocation(shader->ID, "material.diffuse"), 1, glm::value_ptr(diffuse));

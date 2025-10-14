@@ -11,6 +11,7 @@ layout (std140) uniform Matrices {
 	mat4 lightSpaceMatrix;
 };
 
-void main(){
-	gl_Position = projection * view * model * vec4(aPos, 1.0);
-}
+void main()
+{
+    gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+}  

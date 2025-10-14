@@ -17,8 +17,10 @@ public:
 	unsigned int VBO;
 	unsigned int EBO;
 	Shader* shader;
+	Shader* shadowShader;
 
 	std::string shaderName = "basicColorShader";
+	std::string shadowShaderName = "simpleDepthShader";
 
 	std::vector<std::string> textureUrls;
 	std::vector<unsigned int> textures;
@@ -33,6 +35,7 @@ public:
 	virtual void setup() {
 		std::cout << "super" << std::endl;
 	};
+	virtual void setupUniforms(Shader* shader) {};
 	void update();
 	void draw();
 

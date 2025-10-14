@@ -5,7 +5,7 @@ public:
 	PlanePrimitive();
 	~PlanePrimitive();
 
-	float vertices[48] = {
+	float vertices[48] = { 
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
 		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
 		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
@@ -17,6 +17,6 @@ public:
 	void setup() override;
 	void setupShader();
 	void setupVertexBuffer();
-	void setupUniforms();
+	void setupUniforms(Shader* shader) override;
 	void setupTextures();
 };

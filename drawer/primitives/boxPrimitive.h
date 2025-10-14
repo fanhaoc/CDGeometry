@@ -55,6 +55,6 @@ public:
     void setup() override;
     void setupShader();
     void setupVertexBuffer();
-    void setupUniforms();
+    void setupUniforms(Shader* shader) override;
     void setupTextures();
 };
