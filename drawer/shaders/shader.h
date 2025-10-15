@@ -11,7 +11,7 @@ public:
 	// 程序ID
 	unsigned int ID;
 	Shader() = default;
-	Shader(const char* vertexPath, const char* fragmentPath, const char* preFragmentPath);
+	Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 	~Shader() {};
 	// 使用程序
 	void use();

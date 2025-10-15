@@ -13,5 +13,5 @@ layout (std140) uniform Matrices {
 
 void main()
 {
-    gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+    gl_Position = model * vec4(aPos, 1.0);
 }  

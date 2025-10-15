@@ -29,20 +29,22 @@ void Drawer::getFrameBuffer(unsigned int &framebuffer, unsigned int &fbTexture) 
 	
 	// 生成纹理附加到帧缓冲上
 	glGenTextures(1, &fbTexture);
-	glBindTexture(GL_TEXTURE_2D, fbTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, fbTexture);
+	for(unsigned int i=0;i!=6;++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	// 设置边界颜色，让超出光视锥的部分不被阴影覆盖
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	//// 设置边界颜色，让超出光视锥的部分不被阴影覆盖
+	//float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 	// 将纹理附加到帧缓冲对象
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fbTexture, 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbTexture, 0);
 	// 不渲染任何颜色
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
@@ -69,8 +71,8 @@ void Drawer::getFrameBuffer(unsigned int &framebuffer, unsigned int &fbTexture) 
 
 int Drawer::draw(){
 	glfwSetCursorPosCallback(window, mouse_callback);
-	unsigned int framebuffer, fbTexture;
-	getFrameBuffer(framebuffer, fbTexture);
+	unsigned int framebuffer, shadowCubeMap;
+	getFrameBuffer(framebuffer, shadowCubeMap);
 	// 创建ubo
 	glGenBuffers(1, &UBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
@@ -81,9 +83,15 @@ int Drawer::draw(){
 	glm::mat4 lightProjection, lightView;
 	glm::mat4 lightSpaceMatrix;
 	//lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10.0f);
-	lightProjection = glm::perspective(glm::radians(75.0f), 1.0f, 0.1f, 10.0f);
-	lightView = glm::lookAt(scene->light->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
-	lightSpaceMatrix = lightProjection * lightView;
+	lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 20.0f);
+	shadowTransforms.push_back(lightProjection * glm::lookAt(scene->light->lightPos, scene->light->lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(scene->light->lightPos, scene->light->lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(scene->light->lightPos, scene->light->lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(scene->light->lightPos, scene->light->lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(scene->light->lightPos, scene->light->lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+	shadowTransforms.push_back(lightProjection * glm::lookAt(scene->light->lightPos, scene->light->lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+	//lightView = glm::lookAt(scene->light->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
+	//lightSpaceMatrix = lightProjection * lightView;
 	glBindBuffer(GL_UNIFORM_BUFFER, UBO);
 	glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(lightSpaceMatrix));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -115,11 +123,9 @@ int Drawer::draw(){
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		
-		drawPrimitives(framebuffer, fbTexture);
-		
+		drawPrimitives(framebuffer, shadowCubeMap);
 		glViewport(0, 0, screenWidth, screenHeight);
-		drawPrimitives(0, fbTexture);
+		drawPrimitives(0, shadowCubeMap);
 
 
 		//// 检查并调用事件，交换缓冲
@@ -131,16 +137,15 @@ int Drawer::draw(){
 }
 
 void Drawer::drawPrimitives(const unsigned int &fb, const unsigned int &shadowMap) {
-
 	// 状态切换
 	glBindFramebuffer(GL_FRAMEBUFFER, fb);
 	glEnable(GL_DEPTH_TEST);
-	if (fb == 0) {
-		glCullFace(GL_BACK);
-	}
-	else {
-		glCullFace(GL_FRONT);
-	}
+	//if (fb == 0) {
+	//	glCullFace(GL_BACK);
+	//}
+	//else {
+	//	glCullFace(GL_FRONT);
+	//}
 	//glEnable(GL_STENCIL_TEST);
 	//glEnable(GL_CULL_FACE);
 	// 渲染指令
@@ -149,16 +154,21 @@ void Drawer::drawPrimitives(const unsigned int &fb, const unsigned int &shadowMa
 	for (SuperPrimitive* sp : scene->primitives) {
 		Shader* shaderPtr = nullptr;
 		if (fb == 0) {
+			// 普通绘制
 			sp->shader->use();
 			shaderPtr = sp->shader;
 			// 传入shadowMap
 			glActiveTexture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, shadowMap);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, shadowMap);
 			glUniform1i(glGetUniformLocation(shaderPtr->ID, "shadowMap"), 10);
 		}
 		else {
+			// 阴影贴图绘制
 			sp->shadowShader->use();
 			shaderPtr = sp->shadowShader;
+			// 将shadowTransforms传入shader
+			for(int i=0;i!=6;++i)
+				glUniformMatrix4fv(glGetUniformLocation(shaderPtr->ID, ("shadowMatrices[" + std::to_string(i) + "]").c_str()), 1, GL_FALSE, glm::value_ptr(shadowTransforms[i]));
 		}
 		glBindVertexArray(sp->VAO);
 
@@ -168,6 +178,7 @@ void Drawer::drawPrimitives(const unsigned int &fb, const unsigned int &shadowMa
 		unsigned int uniformBlockMatrices = glGetUniformBlockIndex(shaderPtr->ID, "Matrices");
 		glUniformBlockBinding(shaderPtr->ID, uniformBlockMatrices, 0);
 		glUniform3fv(glGetUniformLocation(shaderPtr->ID, "viewPos"), 1, glm::value_ptr(camera->cameraPos));
+		glUniform1f(glGetUniformLocation(shaderPtr->ID, "far_plane"), 20.0);
 		scene->light->setup(shaderPtr->ID);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}

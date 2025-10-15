@@ -1,11 +1,33 @@
+#version 330 core
+struct Material {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
+struct Light {
+	vec3 position;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+uniform Material material;
+uniform Light light;
+
 out vec4 FragColor;
 
 in vec3 v_pos;
 in vec3 v_normal;
-in vec4 v_lightSpacePos;
+in vec2 v_texture;
 
 uniform vec3 viewPos;
-uniform sampler2D shadowMap;
+uniform samplerCube shadowMap;
+uniform float far_plane;
 
 
 float LinearizeDepth(float depth)
@@ -16,27 +38,33 @@ float LinearizeDepth(float depth)
     return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
 }
 
-float shadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir){
-	// ndc坐标
-	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-	// 转换到[0,1]区间
-	projCoords = projCoords * 0.5 + 0.5;
-
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-	float currentDepth = LinearizeDepth(projCoords.z);
-	// pcf滤波
-	float shadow = 0.0;
-	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-	for(int x = -1; x <= 1; ++x)
+float shadowCalculation(vec3 fragPos, vec3 lightPos){
+	vec3 fragToLight = fragPos - lightPos;
+	float closestDepth = texture(shadowMap, fragToLight).r;
+	closestDepth *= far_plane;
+	float currentDepth = length(fragToLight);
+	float bias = 0.15;
+	// percentage-closer filtering
+	float shadow= 0.0;
+	int samplerNum = 20;
+	float viewDist = length(viewPos - fragPos);
+	float diskRadius = (1.0 +viewDist / far_plane)/25.0;
+	vec3 sampleOffsetDirections[20] = vec3[]
+	(
+	   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+	   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+	   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+	   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+	   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+	);
+	for(int i = 0; i != samplerNum; ++i)
 	{
-		for(int y = -1; y <= 1; ++y)
-		{
-			float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-			shadow += currentDepth - bias > LinearizeDepth(pcfDepth) ? 0.0 : 1.0;        
-		}    
+		float closestDepth = texture(shadowMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+		closestDepth *= far_plane;   // Undo mapping [0;1]
+		if(currentDepth - bias < closestDepth)
+			shadow += 1.0;
 	}
-	shadow /= 9.0;
-
+	shadow /= float(samplerNum);
 	return shadow;
 }
 
@@ -56,7 +84,7 @@ vec3 c_phong(vec3 fragPos, vec3 normal, Material material){
 	float distanceFL = length(light.position - fragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distanceFL + light.quadratic * distanceFL * distanceFL);
 
-	float shadow = shadowCalculation(v_lightSpacePos, normal, lightDir);
+	float shadow = shadowCalculation(v_pos, light.position);
 
 	return (ambient + shadow * (diffuse + specular)) * attenuation;
 	//return vec3(shadow, 0.0, 0.0);

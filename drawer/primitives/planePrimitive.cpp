@@ -15,15 +15,12 @@ void PlanePrimitive::setup() {
 void PlanePrimitive::setupShader() {
 	std::string vsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".vs");
 	std::string fsPath = Trick::solvePath("drawer/shaders/" + shaderName + ".fs");
-	std::string pre = "drawer/shaders/presetShader.fs";
-	std::string preFsPath = Trick::solvePath(pre);
-	shader = new Shader(vsPath.c_str(), fsPath.c_str(), preFsPath.c_str());
+	shader = new Shader(vsPath.c_str(), fsPath.c_str());
 
 	std::string vsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".vs");
 	std::string fsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".fs");
-	std::string pre01 = "drawer/shaders/presetShader.fs";
-	std::string preFsPath01 = Trick::solvePath(pre01);
-	shadowShader = new Shader(vsPath_01.c_str(), fsPath_01.c_str(), preFsPath01.c_str());
+	std::string gsPath_01 = Trick::solvePath("drawer/shaders/" + shadowShaderName + ".gs");
+	shadowShader = new Shader(vsPath_01.c_str(), fsPath_01.c_str(), gsPath_01.c_str());
 }
 
 void PlanePrimitive::setupVertexBuffer() {

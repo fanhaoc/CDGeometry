@@ -25,6 +25,8 @@ public:
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	float lastFrame = 0.0; //上一帧的时间
 	float deltaFrame = 0.0; //这一帧和上一帧的时间差
+	// 阴影的一些参数
+	std::vector<glm::mat4> shadowTransforms;
 
 	// 摄像机参数
 	bool mouseLeftEnter = false;
@@ -32,8 +34,6 @@ public:
 	float yaw=-90, pitch=0.0;
 	glm::vec3 cameraFront;
 
-	//glm::mat4 viewMatrix;
-	//glm::mat4 projMatrix;
 	std::vector<SuperPrimitive*> sps;
 	Camera* camera = new Camera();
 
