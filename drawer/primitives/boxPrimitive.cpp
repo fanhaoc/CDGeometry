@@ -46,8 +46,18 @@ void BoxPrimitive::setupUniforms(Shader *shader) {
 	glUniform3fv(glGetUniformLocation(shader->ID, "material.specular"), 1, glm::value_ptr(specular));
 	glUniform1f(glGetUniformLocation(shader->ID, "material.shininess"), shininess);
 	glUniformMatrix4fv(glGetUniformLocation(shader->ID, "model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+	// pbrÊôÐÔ
+	glUniform3fv(glGetUniformLocation(shader->ID, "albedo"), 1, glm::value_ptr(albedo));
+	glUniform1f(glGetUniformLocation(shader->ID, "metallic"), metallic);
+	glUniform1f(glGetUniformLocation(shader->ID, "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(shader->ID, "ao"), ao);
 }
 
 void BoxPrimitive::setupTextures() {
-
+	std::string a1 = "assets/rustediron";
+	std::string Path01 = Trick::solvePath(a1);
+	textures.push_back(Trick::TextureFromFile("rustediron2_basecolor.png", Path01.c_str()));
+	textures.push_back(Trick::TextureFromFile("rustediron2_metallic.png", Path01.c_str()));
+	textures.push_back(Trick::TextureFromFile("rustediron2_roughness.png", Path01.c_str()));
 }

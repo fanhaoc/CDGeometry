@@ -32,6 +32,13 @@ public:
 	glm::vec3 specular = glm::vec3(0.5, 0.5, 0.5);
 	float shininess = 32.0f;
 
+	// pbr Ù–‘
+	glm::vec3 albedo = glm::vec3(0.5, 0.0, 0.0);
+	float metallic = 1.0f;
+	float roughness = 0.3f;
+	float ao = 1.0f;
+	std::string textureNames[3] = { "albedoMap", "metallicMap", "roughnessMap" };
+
 	virtual void setup() {
 		std::cout << "super" << std::endl;
 	};

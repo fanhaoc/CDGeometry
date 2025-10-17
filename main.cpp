@@ -30,7 +30,7 @@ int main() {
 
 	Scene* scene = new Scene();
 
-	Light* light = new Light(glm::vec3(1.2f, 2.0f, 2.0f), glm::vec3(1.0, 1.0, 1.0));
+	Light* light = new Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0, 1.0, 1.0));
 	scene->light = light;
 		
 
@@ -46,7 +46,7 @@ int main() {
 	//scene->primitives.push_back(lightCube);
 
 	SuperPrimitive* cubeObj = new BoxPrimitive();
-	cubeObj->shaderName = "phongColorShader";
+	cubeObj->shaderName = "pbrShader";
 	cubeObj->modelMatrix = glm::translate(cubeObj->modelMatrix, glm::vec3(0.0, 1.0, -1.0));
 	cubeObj->setup();
 	scene->primitives.push_back(cubeObj);

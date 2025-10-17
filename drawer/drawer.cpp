@@ -161,6 +161,12 @@ void Drawer::drawPrimitives(const unsigned int &fb, const unsigned int &shadowMa
 			glActiveTexture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, shadowMap);
 			glUniform1i(glGetUniformLocation(shaderPtr->ID, "shadowMap"), 10);
+			// 传入texture
+			for (unsigned int i = 0; i < sp->textures.size(); ++i) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, sp->textures[i]);
+				glUniform1i(glGetUniformLocation(shaderPtr->ID, sp->textureNames[i].c_str()), i);
+			}
 		}
 		else {
 			// 阴影贴图绘制
